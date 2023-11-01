@@ -877,7 +877,7 @@ class Reply(models.Model):
         address = self.relay_address or self.domain_address
         address.num_replied += 1
         address.last_used_at = datetime.now(timezone.utc)
-        address.save(update_fields=["num_replied", "last_used_at"])
+        address.save()
         return address.num_replied
 
 

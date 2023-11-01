@@ -562,6 +562,8 @@ class SNSNotificationTest(TestCase):
         }
         encrypted_metadata = encrypt_reply_metadata(encryption_key, metadata)
         relay_address = baker.make(RelayAddress, user=user, address="a1b2c3d4")
+        assert (old_modified_at := relay_address.last_modified_at)
+        assert relay_address.last_used_at is None
         Reply.objects.create(
             lookup=b64_lookup_key(lookup_key),
             encrypted_metadata=encrypted_metadata,
@@ -595,9 +597,9 @@ class SNSNotificationTest(TestCase):
 
         relay_address.refresh_from_db()
         assert relay_address.num_replied == 1
-        last_used_at = relay_address.last_used_at
-        assert last_used_at
+        assert (last_used_at := relay_address.last_used_at)
         assert (datetime.now(tz=timezone.utc) - last_used_at).seconds < 2.0
+        assert relay_address.last_modified_at > old_modified_at
         return email
 
     def test_reply_with_emoji_in_text(self) -> None:
