@@ -472,6 +472,17 @@ class SNSNotificationTest(TestCase):
         assert self.ra.num_blocked == 0
         assert self.ra.block_list_emails is False
 
+    def test_disabled_address_is_blocked(self) -> None:
+        self.ra.enabled = False
+        self.ra.save()
+
+        _sns_notification(EMAIL_SNS_BODIES["single_recipient_list"])
+
+        self.mock_send_raw_email.assert_not_called()
+        self.ra.refresh_from_db()
+        assert self.ra.num_forwarded == 0
+        assert self.ra.num_blocked == 1
+
     def test_spamVerdict_FAIL_default_still_relays(self) -> None:
         """For a default user, spam email will still relay."""
         _sns_notification(EMAIL_SNS_BODIES["spamVerdict_FAIL"])
