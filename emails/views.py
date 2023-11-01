@@ -699,14 +699,7 @@ def _handle_received(message_json: AWS_SNSMessageJSON) -> HttpResponse:
         address.num_level_one_trackers_blocked = (
             address.num_level_one_trackers_blocked or 0
         ) + level_one_trackers_removed
-    address.save(
-        update_fields=[
-            "num_forwarded",
-            "last_used_at",
-            "block_list_emails",
-            "num_level_one_trackers_blocked",
-        ]
-    )
+    address.save()
     return HttpResponse("Sent email to final recipient.", status=200)
 
 

@@ -351,6 +351,8 @@ class SNSNotificationTest(TestCase):
     def test_single_recipient_sns_notification(self) -> None:
         _sns_notification(EMAIL_SNS_BODIES["single_recipient"])
 
+        assert self.ra.last_used_at is None
+        assert (old_modified_at := self.ra.last_modified_at) is not None
         sender, recipient, headers, email = self.get_details_from_mock_send_raw_email()
         assert sender == "replies@default.com"
         assert recipient == "user@example.com"
@@ -370,6 +372,7 @@ class SNSNotificationTest(TestCase):
         assert self.ra.num_forwarded == 1
         assert self.ra.last_used_at is not None
         assert (datetime.now(tz=timezone.utc) - self.ra.last_used_at).seconds < 2.0
+        assert self.ra.last_modified_at > old_modified_at
 
     def test_single_french_recipient_sns_notification(self) -> None:
         """
