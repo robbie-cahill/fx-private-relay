@@ -583,7 +583,7 @@ def _handle_received(message_json: AWS_SNSMessageJSON) -> HttpResponse:
     if not address.enabled:
         incr_if_enabled("email_for_disabled_address", 1)
         address.num_blocked += 1
-        address.save(update_fields=["num_blocked"])
+        address.save()
         _record_receipt_verdicts(receipt, "disabled_alias")
         # TODO: Add metrics
         return HttpResponse("Address is temporarily disabled.")

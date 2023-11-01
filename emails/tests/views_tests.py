@@ -475,6 +475,8 @@ class SNSNotificationTest(TestCase):
     def test_disabled_address_is_blocked(self) -> None:
         self.ra.enabled = False
         self.ra.save()
+        assert (old_modified_at := self.ra.last_modified_at) is not None
+        assert self.ra.last_used_at is None
 
         _sns_notification(EMAIL_SNS_BODIES["single_recipient_list"])
 
@@ -482,6 +484,8 @@ class SNSNotificationTest(TestCase):
         self.ra.refresh_from_db()
         assert self.ra.num_forwarded == 0
         assert self.ra.num_blocked == 1
+        assert self.ra.last_modified_at > old_modified_at
+        assert self.ra.last_used_at is None
 
     def test_spamVerdict_FAIL_default_still_relays(self) -> None:
         """For a default user, spam email will still relay."""
