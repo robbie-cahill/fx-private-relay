@@ -600,7 +600,7 @@ def _handle_received(message_json: AWS_SNSMessageJSON) -> HttpResponse:
     ):
         incr_if_enabled("list_email_for_address_blocking_lists", 1)
         address.num_blocked += 1
-        address.save(update_fields=["num_blocked"])
+        address.save()
         return HttpResponse("Address is not accepting list emails.")
 
     # Collect new headers

@@ -438,6 +438,8 @@ class SNSNotificationTest(TestCase):
         self.ra.save()
         self.ra.block_list_emails = True
         self.ra.save()
+        assert (old_modified_at := self.ra.last_modified_at) is not None
+        assert self.ra.last_used_at is None
 
         _sns_notification(EMAIL_SNS_BODIES["single_recipient_list"])
 
@@ -445,6 +447,8 @@ class SNSNotificationTest(TestCase):
         self.ra.refresh_from_db()
         assert self.ra.num_forwarded == 0
         assert self.ra.num_blocked == 1
+        assert self.ra.last_modified_at > old_modified_at
+        assert self.ra.last_used_at is None
 
     def test_block_list_email_former_premium_user(self) -> None:
         """List emails are forwarded for formerly premium users."""
